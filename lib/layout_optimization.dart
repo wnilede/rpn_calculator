@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:rpn_calculator/combinatorics.dart';
 
 class Optimizable extends StatelessWidget {
@@ -56,25 +55,27 @@ class Optimizable extends StatelessWidget {
   }
 
   double calculateBadnessForSize(Size size) => badnessCoefficients.width * (size.width - preferredSize.width) * (size.width - preferredSize.width) + badnessCoefficients.height * (size.height - preferredSize.height) * (size.height - preferredSize.height) + constantBadness;
-  static List<Optimizable> _getAllPossibleLayouts({required List<Optimizable> children, required bool vertical}) {
+  static List<Optimizable> _findAllLayouts({required List<Optimizable> children, required bool vertical}) {
+    if (children.isEmpty) {
+      return [];
+    }
+    if (children.length == 1) {
+      return [
+        children[0]
+      ];
+    }
     List<Optimizable> result = [];
     for (List<List<Optimizable>> grouping in getAllPossibleGroupings(children)) {
-      // The grouping consists of a single group with all children is handled separately to prevent infinite recursion.
+      // The grouping consisting of a single group with containing every child produces the same layout as the grouping consisting of as many groups as there are children with one child in each. These groupings are not the same (we already checked that there were more than one child), so we can ignore one of them.
       if (grouping.length == 1) {
-        result.add(
-          Optimizable._childrenInLine(
-            vertical: vertical,
-            children: children,
-          ),
-        );
-        break;
+        continue;
       }
       // Add all possible layouts where the children are grouped according to grouping.
       result.addAll(
         grouping
             // Get all possible layouts for each group.
             .map(
-              (group) => _getAllPossibleLayouts(
+              (group) => _findAllLayouts(
                 children: group,
                 vertical: !vertical,
               ),
@@ -110,11 +111,11 @@ class LayoutOptimizer extends StatelessWidget {
         builder: (context, constraints) => _findAllLayouts().minimizes((possibility) => possibility.calculateBadnessForSize(constraints.biggest)),
       );
 
-  List<Optimizable> _findAllLayouts() => Optimizable._getAllPossibleLayouts(
+  List<Optimizable> _findAllLayouts() => Optimizable._findAllLayouts(
         vertical: true,
         children: children,
       )..addAll(
-          Optimizable._getAllPossibleLayouts(
+          Optimizable._findAllLayouts(
             vertical: false,
             children: children,
           ),
