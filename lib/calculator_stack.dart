@@ -1,13 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:rpn_calculator/number_presentation.dart';
 
-class CalculatorStack {
+class CalculatorStack extends ChangeNotifier {
   List<double> _values = List<double>.unmodifiable([]);
-  NumberPresentation _currentInput;
+  NumberPresentation _currentInput = NumberPresentation.empty();
   InputMode _inputMode = InputMode.writing;
-  final void Function(void Function()) _setState;
   bool _topOfStackIsDuplicate = false; // When pressing enter, the top is duplicated temporarily and is removed unless enter is pressed again.
-
-  CalculatorStack(this._setState) : _currentInput = NumberPresentation.empty();
 
   int get length => _values.length;
   InputMode get inputMode => _inputMode;
@@ -15,13 +13,12 @@ class CalculatorStack {
   double operator [](int index) => _values[index];
 
   void _push(double value) {
-    _setState(() {
-      _values = List<double>.unmodifiable([
-        value,
-        ..._values,
-      ]);
-      _topOfStackIsDuplicate = false;
-    });
+    _values = List<double>.unmodifiable([
+      value,
+      ..._values,
+    ]);
+    _topOfStackIsDuplicate = false;
+    notifyListeners();
   }
 
   double? _pop() {
@@ -29,9 +26,8 @@ class CalculatorStack {
       return null;
     }
     double value = _values[0];
-    _setState(() {
-      _values = List<double>.unmodifiable(_values.skip(1));
-    });
+    _values = List<double>.unmodifiable(_values.skip(1));
+    notifyListeners();
     return value;
   }
 
@@ -57,10 +53,9 @@ class CalculatorStack {
   }
 
   void _clearInputLine() {
-    _setState(() {
-      _currentInput = NumberPresentation.empty();
-      _inputMode = InputMode.writing;
-    });
+    _currentInput = NumberPresentation.empty();
+    _inputMode = InputMode.writing;
+    notifyListeners();
   }
 
   void _pushInputLineToStack() {
@@ -88,15 +83,13 @@ class CalculatorStack {
     switch (_inputMode) {
       case InputMode.writing:
         if (currentInput.numberOfDigits < 10 && (currentInput.numberOfDigits != 0 || digitToEnter != 0 || currentInput.isEmpty)) {
-          _setState(() {
-            _currentInput = currentInput.copyWith(mainPart: '${currentInput.mainPart == '0' ? '' : currentInput.mainPart}$digitToEnter');
-          });
+          _currentInput = currentInput.copyWith(mainPart: '${currentInput.mainPart == '0' ? '' : currentInput.mainPart}$digitToEnter');
+          notifyListeners();
         }
         break;
       case InputMode.writingExponent:
-        _setState(() {
-          _currentInput = currentInput.copyWith(exponent: '${currentInput.exponent!.substring(1)}$digitToEnter');
-        });
+        _currentInput = currentInput.copyWith(exponent: '${currentInput.exponent!.substring(1)}$digitToEnter');
+        notifyListeners();
         break;
     }
   }
@@ -106,9 +99,8 @@ class CalculatorStack {
     switch (_inputMode) {
       case InputMode.writing:
         if (!_currentInput.mainPart.contains('.') && _currentInput.mainPart.length < 11) {
-          _setState(() {
-            _currentInput = currentInput.copyWith(mainPart: '${currentInput.mainPart == '' ? '0' : currentInput.mainPart}.');
-          });
+          _currentInput = currentInput.copyWith(mainPart: '${currentInput.mainPart == '' ? '0' : currentInput.mainPart}.');
+          notifyListeners();
         }
         break;
       case InputMode.writingExponent:
@@ -126,10 +118,9 @@ class CalculatorStack {
       double currentValue = _currentInput.toDouble();
       _push(currentValue);
       _push(currentValue);
-      _setState(() {
-        _currentInput = NumberPresentation.empty();
-        _topOfStackIsDuplicate = true;
-      });
+      _currentInput = NumberPresentation.empty();
+      _topOfStackIsDuplicate = true;
+      notifyListeners();
     }
   }
 }

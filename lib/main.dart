@@ -39,9 +39,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late CalculatorStack _stack;
 
-  _MyHomePageState() {
-    _stack = CalculatorStack(setState);
-  }
+  _MyHomePageState() : _stack = CalculatorStack();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +49,10 @@ class _MyHomePageState extends State<MyHomePage> {
             preferredWidth: 400,
             preferredHeight: 150,
             badnessMultiplierHeight: 10,
-            child: StackView(stack: _stack, numStackEntriesShown: 4),
+            child: AnimatedBuilder(
+              animation: _stack,
+              builder: (context, child) => StackView(stack: _stack, numStackEntriesShown: 4),
+            ),
           ),
           Optimizable(
             preferredWidth: 180,
