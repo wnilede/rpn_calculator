@@ -8,7 +8,10 @@ void testLayoutOptimizer(String description, double screenWidth, double screenHe
   testWidgets(
     description,
     (tester) async {
-      tester.binding.window.physicalSizeTestValue = Size(screenWidth, screenHeight);
+      Size screenSize = Size(screenWidth, screenHeight);
+      tester.binding.window.physicalSizeTestValue = screenSize;
+      await tester.binding.setSurfaceSize(screenSize);
+      tester.binding.window.devicePixelRatioTestValue = 1;
       await tester.pumpWidget(
         MaterialApp(
           home: LayoutOptimizer(children: children.map((c) => c.optimizable).toList()),
@@ -16,12 +19,15 @@ void testLayoutOptimizer(String description, double screenWidth, double screenHe
       );
       int i = 0;
       for (TestableWidget child in children) {
-        final evaluated = find.byWidget(child.optimizable).evaluate().single;
-        expect(evaluated.size!.width, child.expectedWidth, reason: 'Child $i had not the expected width.');
-        expect(evaluated.size!.height, child.expectedHeight, reason: 'Child $i had not the expected height.');
+        final evaluated = find.byWidget(child.optimizable).evaluate();
+        if (evaluated.length != 1) {
+          fail('Child $i was rendered ${evaluated.length} times.');
+        }
+        expect(evaluated.single.size!.width, child.expectedWidth, reason: 'Child $i had not the expected width.');
+        expect(evaluated.single.size!.height, child.expectedHeight, reason: 'Child $i had not the expected height.');
         i++;
       }
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearAllTestValues);
     },
   );
 }
