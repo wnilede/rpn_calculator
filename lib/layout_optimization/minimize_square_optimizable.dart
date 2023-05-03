@@ -9,7 +9,7 @@ class LeastSquareLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LayoutOptimizer<LeastSquareParameters>(
-        calculateBadnessForSize: (parameters, size) => parameters.badnessCoefficients.width * (size.width - parameters.preferredSize.width) * (size.width - parameters.preferredSize.width) + parameters.badnessCoefficients.height * (size.height - parameters.preferredSize.height) * (size.height - parameters.preferredSize.height) + parameters.constantBadness,
+        calculateBadnessForSize: (parameters, size) => parameters.badnessCoefficients.width * (size.width - parameters.preferredSize.width).squared + parameters.badnessCoefficients.height * (size.height - parameters.preferredSize.height).squared + parameters.constantBadness,
         getOptimalWidths: (parametersChildren, confinement) {
           final sumInvertedCoefficients = parametersChildren.sum((child) => 1 / child.badnessCoefficients.width);
           final sumPreferred = parametersChildren.sum((child) => child.preferredSize.width);
