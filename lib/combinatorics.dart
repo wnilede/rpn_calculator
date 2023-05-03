@@ -100,3 +100,7 @@ extension CombinatoricsListList<T> on List<List<T>> {
         .toList();
   }
 }
+
+extension CombinatoricsNum<T extends num> on T {
+  T get squared => (this * this) as T;
+}

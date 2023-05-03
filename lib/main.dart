@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:rpn_calculator/constants.dart';
 import 'buttons.dart';
 import 'calculator_stack.dart';
-import 'layout_optimization.dart';
+import 'layout_optimization/layout_optimizer.dart';
+import 'layout_optimization/minimize_square_optimizable.dart';
 import 'stack_view.dart';
 import 'fundamental_operations.dart';
 import 'trigonometric_functions.dart';
@@ -43,35 +44,45 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutOptimizer(
+      body: LeastSquareLayout(
         children: [
           Optimizable(
-            preferredWidth: 400,
-            preferredHeight: 150,
-            badnessMultiplierHeight: 10,
+            parameters: LeastSquareParameters(
+              preferredWidth: 400,
+              preferredHeight: 150,
+              badnessMultiplierHeight: 10,
+            ),
             child: AnimatedBuilder(
               animation: _stack,
               builder: (context, child) => StackView(stack: _stack, numStackEntriesShown: 4),
             ),
           ),
           Optimizable(
-            preferredWidth: 180,
-            preferredHeight: 240,
+            parameters: LeastSquareParameters(
+              preferredWidth: 180,
+              preferredHeight: 240,
+            ),
             child: DigitTable(stack: _stack),
           ),
           Optimizable(
-            preferredWidth: 120,
-            preferredHeight: 120,
+            parameters: LeastSquareParameters(
+              preferredWidth: 120,
+              preferredHeight: 120,
+            ),
             child: FundamentalOperations(stack: _stack),
           ),
           Optimizable(
-            preferredWidth: 150,
-            preferredHeight: 50,
+            parameters: LeastSquareParameters(
+              preferredWidth: 150,
+              preferredHeight: 50,
+            ),
             child: TrigonometricFunctions(stack: _stack),
           ),
           Optimizable(
-            preferredWidth: 100,
-            preferredHeight: 50,
+            parameters: LeastSquareParameters(
+              preferredWidth: 100,
+              preferredHeight: 50,
+            ),
             child: Constants(stack: _stack),
           )
         ],

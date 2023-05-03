@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:rpn_calculator/layout_optimization.dart';
+import 'package:rpn_calculator/layout_optimization/layout_optimizer.dart';
 import 'package:meta/meta.dart';
+import 'package:rpn_calculator/layout_optimization/minimize_square_optimizable.dart';
 
 @isTest
-void testLayoutOptimizer(String description, double screenWidth, double screenHeight, List<TestableWidget> children) {
+void testMinimizeSquareOptimizer(String description, double screenWidth, double screenHeight, List<TestableWidget<LeastSquareParameters>> children) {
   testWidgets(
     description,
     (tester) async {
@@ -14,7 +15,7 @@ void testLayoutOptimizer(String description, double screenWidth, double screenHe
       tester.binding.window.devicePixelRatioTestValue = 1;
       await tester.pumpWidget(
         MaterialApp(
-          home: LayoutOptimizer(children: children.map((c) => c.optimizable).toList()),
+          home: LeastSquareLayout(children: children.map((c) => c.optimizable).toList()),
         ),
       );
       int i = 0;
@@ -32,23 +33,17 @@ void testLayoutOptimizer(String description, double screenWidth, double screenHe
   );
 }
 
-class TestableWidget {
-  final Optimizable optimizable;
+class TestableWidget<TParameters extends OptimizationParameters<TParameters>> {
+  final Optimizable<TParameters> optimizable;
   final double expectedWidth;
   final double expectedHeight;
 
   TestableWidget({
-    required double preferredWidth,
-    required double preferredHeight,
-    double? badnessMultiplierWidth,
-    double? badnessMultiplierHeight,
+    required TParameters parameters,
     required this.expectedWidth,
     required this.expectedHeight,
-  }) : optimizable = Optimizable(
-          preferredWidth: preferredWidth,
-          preferredHeight: preferredHeight,
-          badnessMultiplierWidth: badnessMultiplierWidth,
-          badnessMultiplierHeight: badnessMultiplierHeight,
+  }) : optimizable = Optimizable<TParameters>(
+          parameters: parameters,
           child: Placeholder(),
         );
 }
