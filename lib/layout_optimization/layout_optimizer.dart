@@ -2,21 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:rpn_calculator/combinatorics.dart';
 
 class LayoutOptimizer<TParameters extends OptimizationParameters<TParameters>> extends StatelessWidget {
-  // Determine how bad a size is for an optimizable with specified parameters.
-  final double Function(TParameters parameters, Size size) calculateBadnessForSize;
-
-  // Should return the widths of the children that minimizes the sum of the badness for them if placed in a row.
-  final List<double> Function(List<TParameters> parametersChildren, Size confinement) getOptimalWidths;
-
-  // Should return the parameters for a row containing children with given parameters.
-  final TParameters Function(List<TParameters> parametersChildren) getParametersOfRow;
-
+  final OptimizationStrategy<TParameters> strategy;
   final List<Optimizable<TParameters>> children;
 
   LayoutOptimizer({
-    required this.calculateBadnessForSize,
-    required this.getOptimalWidths,
-    required this.getParametersOfRow,
+    required this.strategy,
     required this.children,
   });
 
@@ -66,12 +56,12 @@ class LayoutOptimizer<TParameters extends OptimizationParameters<TParameters>> e
       return children[0];
     }
     List<TParameters> parametersChildren = children.map((child) => vertical ? child.parameters.transposed : child.parameters).toList();
-    TParameters parameters = getParametersOfRow(parametersChildren);
+    TParameters parameters = strategy.getParametersOfRow(parametersChildren);
     return Optimizable<TParameters>(
       parameters: vertical ? parameters.transposed : parameters,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final sizes = getOptimalWidths(parametersChildren, vertical ? constraints.biggest.flipped : constraints.biggest);
+          final sizes = strategy.getOptimalWidths(parametersChildren, vertical ? constraints.biggest.flipped : constraints.biggest);
           final resizedChildren = <Widget>[];
           for (int i = 0; i < sizes.length; i++) {
             resizedChildren.add(
@@ -111,9 +101,22 @@ class LayoutOptimizer<TParameters extends OptimizationParameters<TParameters>> e
   @override
   Widget build(BuildContext context) => LayoutBuilder(
         builder: (context, constraints) => findAllLayouts(children).minimizes(
-          (possibility) => calculateBadnessForSize(possibility.parameters, constraints.biggest),
+          (possibility) => strategy.calculateBadnessForSize(possibility.parameters, constraints.biggest),
         ),
       );
+}
+
+class OptimizationStrategy<TParameters extends OptimizationParameters<TParameters>> {
+  // Determine how bad a size is for an optimizable with specified parameters.
+  final double Function(TParameters parameters, Size size) calculateBadnessForSize;
+
+  // Should return the widths of the children that minimizes the sum of the badness for them if placed in a row.
+  final List<double> Function(List<TParameters> parametersChildren, Size confinement) getOptimalWidths;
+
+  // Should return the parameters for a row containing children with given parameters.
+  final TParameters Function(List<TParameters> parametersChildren) getParametersOfRow;
+
+  OptimizationStrategy({required this.calculateBadnessForSize, required this.getOptimalWidths, required this.getParametersOfRow});
 }
 
 class Optimizable<TParameters extends OptimizationParameters<TParameters>> extends StatelessWidget {

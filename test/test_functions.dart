@@ -2,10 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:rpn_calculator/layout_optimization/layout_optimizer.dart';
 import 'package:meta/meta.dart';
-import 'package:rpn_calculator/layout_optimization/minimize_square_optimizable.dart';
 
 @isTest
-void testMinimizeSquareOptimizer(String description, double screenWidth, double screenHeight, List<TestableWidget<LeastSquareParameters>> children) {
+void testLayoutOptimizer<TParameters extends OptimizationParameters<TParameters>>(String description, double screenWidth, double screenHeight, OptimizationStrategy<TParameters> strategy, List<TestableWidget<TParameters>> children) {
   testWidgets(
     description,
     (tester) async {
@@ -15,7 +14,10 @@ void testMinimizeSquareOptimizer(String description, double screenWidth, double 
       tester.binding.window.devicePixelRatioTestValue = 1;
       await tester.pumpWidget(
         MaterialApp(
-          home: LeastSquareLayout(children: children.map((c) => c.optimizable).toList()),
+          home: LayoutOptimizer(
+            strategy: strategy,
+            children: children.map((c) => c.optimizable).toList(),
+          ),
         ),
       );
       int i = 0;

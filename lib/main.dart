@@ -3,7 +3,7 @@ import 'package:rpn_calculator/constants.dart';
 import 'buttons.dart';
 import 'calculator_stack.dart';
 import 'layout_optimization/layout_optimizer.dart';
-import 'layout_optimization/minimize_square_optimizable.dart';
+import 'layout_optimization/minimize_square_optimizer.dart' as mso;
 import 'stack_view.dart';
 import 'fundamental_operations.dart';
 import 'trigonometric_functions.dart';
@@ -44,10 +44,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LeastSquareLayout(
+      body: LayoutOptimizer(
+        strategy: mso.strategy,
         children: [
           Optimizable(
-            parameters: LeastSquareParameters(
+            parameters: mso.Parameters(
               preferredWidth: 400,
               preferredHeight: 150,
               badnessMultiplierHeight: 10,
@@ -58,28 +59,28 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Optimizable(
-            parameters: LeastSquareParameters(
+            parameters: mso.Parameters(
               preferredWidth: 180,
               preferredHeight: 240,
             ),
             child: DigitTable(stack: _stack),
           ),
           Optimizable(
-            parameters: LeastSquareParameters(
+            parameters: mso.Parameters(
               preferredWidth: 120,
               preferredHeight: 120,
             ),
             child: FundamentalOperations(stack: _stack),
           ),
           Optimizable(
-            parameters: LeastSquareParameters(
+            parameters: mso.Parameters(
               preferredWidth: 150,
               preferredHeight: 50,
             ),
             child: TrigonometricFunctions(stack: _stack),
           ),
           Optimizable(
-            parameters: LeastSquareParameters(
+            parameters: mso.Parameters(
               preferredWidth: 100,
               preferredHeight: 50,
             ),
