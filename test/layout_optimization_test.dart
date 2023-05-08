@@ -18,8 +18,8 @@ void main() {
   group('Minimize square', () {
     testStrategyIsConsistent(
       'Minimize square strategy is consistent',
-      mso.strategy,
-      [
+      strategy: mso.strategy,
+      scenarios: [
         [
           mso.Parameters(preferredWidth: 100, preferredHeight: 100),
           mso.Parameters(preferredWidth: 100, preferredHeight: 100),
@@ -46,7 +46,8 @@ void main() {
           mso.Parameters(preferredWidth: 143, preferredHeight: 115, badnessMultiplierHeight: 4, badnessMultiplierWidth: 17),
         ],
       ],
-      sizesToTry,
+      sizes: sizesToTry,
+      checkWidthsPositive: false,
     );
     testLayoutOptimizer('2 children perfectly in column', 100, 200, mso.strategy, [
       TestableWidget(
@@ -147,8 +148,8 @@ void main() {
   group('Inverted', () {
     testStrategyIsConsistent(
       'Inverted strategy is consistent',
-      inv.strategy,
-      [
+      strategy: inv.strategy,
+      scenarios: [
         [
           inv.Parameters(preferredWidth: 100, preferredHeight: 100),
           inv.Parameters(preferredWidth: 100, preferredHeight: 100),
@@ -175,7 +176,7 @@ void main() {
           inv.Parameters(preferredWidth: 143, preferredHeight: 115),
         ],
       ],
-      sizesToTry,
+      sizes: sizesToTry,
     );
     testLayoutOptimizer('2 children perfectly in column', 100, 200, inv.strategy, [
       TestableWidget(

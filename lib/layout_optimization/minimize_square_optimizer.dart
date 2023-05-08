@@ -8,38 +8,12 @@ OptimizationStrategy<Parameters> get strategy => OptimizationStrategy<Parameters
       getParametersOfRow: getParametersOfRow,
     );
 
-double calculateBadnessForSize(Parameters parameters, Size size) {
-  if (size.width < 0 || size.height < 0) {
-    return double.infinity;
-  }
-  return parameters.badnessCoefficients.width * (size.width - parameters.preferredSize.width).squared + parameters.badnessCoefficients.height * (size.height - parameters.preferredSize.height).squared + parameters.constantBadness;
-}
+double calculateBadnessForSize(Parameters parameters, Size size) => parameters.badnessCoefficients.width * (size.width - parameters.preferredSize.width).squared + parameters.badnessCoefficients.height * (size.height - parameters.preferredSize.height).squared + parameters.constantBadness;
 
 List<double> getOptimalWidths(List<Parameters> parametersChildren, Size confinement) {
-  final result = List<double>.filled(parametersChildren.length, 1);
-  while (true) {
-    double sumPreferred = 0;
-    double sumInvertedCoefficients = 0;
-    for (int i = 0; i < parametersChildren.length; i++) {
-      if (result[i] > 0) {
-        sumPreferred += parametersChildren[i].preferredSize.width;
-        sumInvertedCoefficients += 1 / parametersChildren[i].badnessCoefficients.width;
-      }
-    }
-    bool newVanishing = false;
-    for (int i = 0; i < parametersChildren.length; i++) {
-      if (result[i] > 0) {
-        result[i] = parametersChildren[i].preferredSize.width + (confinement.width - sumPreferred) / sumInvertedCoefficients / parametersChildren[i].badnessCoefficients.width;
-        if (result[i] < 0) {
-          result[i] = 0;
-          newVanishing = true;
-        }
-      }
-    }
-    if (!newVanishing) {
-      return result;
-    }
-  }
+  final sumInvertedCoefficients = parametersChildren.sum((child) => 1 / child.badnessCoefficients.width);
+  final sumPreferred = parametersChildren.sum((child) => child.preferredSize.width);
+  return parametersChildren.map((child) => child.preferredSize.width + (confinement.width - sumPreferred) / sumInvertedCoefficients / child.badnessCoefficients.width).toList();
 }
 
 Parameters getParametersOfRow(List<Parameters> parametersChildren) {
