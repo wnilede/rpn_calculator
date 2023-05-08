@@ -58,13 +58,13 @@ extension CombinatoricsIterableIterable<T> on Iterable<Iterable<T>> {
       );
 }
 
-extension CombinatoricsList<T> on List<T> {
+extension CombinatoricsIterable<T> on Iterable<T> {
   T maximizes<S extends num>(S Function(T) selector) {
     if (isEmpty) {
       throw ArgumentError('List is empty.');
     }
-    S bestValue = selector(this[0]);
-    T bestElement = this[0];
+    T bestElement = first;
+    S bestValue = selector(bestElement);
     for (T element in this) {
       S value = selector(element);
       if (value > bestValue) {
