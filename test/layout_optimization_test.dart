@@ -21,6 +21,9 @@ void main() {
       strategy: mso.strategy,
       scenarios: [
         [
+          mso.Parameters(preferredWidth: 100, preferredHeight: 100, badnessMultiplierHeight: 2),
+        ],
+        [
           mso.Parameters(preferredWidth: 100, preferredHeight: 100),
           mso.Parameters(preferredWidth: 100, preferredHeight: 100),
         ],
@@ -150,6 +153,9 @@ void main() {
       'Inverted strategy is consistent',
       strategy: inv.strategy,
       scenarios: [
+        [
+          inv.Parameters(preferredWidth: 100, preferredHeight: 100),
+        ],
         [
           inv.Parameters(preferredWidth: 100, preferredHeight: 100),
           inv.Parameters(preferredWidth: 100, preferredHeight: 100),
